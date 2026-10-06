@@ -1,6 +1,6 @@
 {
   "name": "origin-emdash-cards",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Craft-style repeaters for EmDash: items as cards, each edited in a slide-out panel.",
   "type": "module",
   "license": "MIT",
