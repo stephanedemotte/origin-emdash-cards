@@ -171,12 +171,16 @@ const S = {
 // dialogs — the media picker of an image sub-field, a confirm — carry no
 // z-index at all: Kumo stacks them in document order. Opened from the panel,
 // the picker landed BEHIND it, under its backdrop, unclickable. The panel marks
-// its portal; every Base UI portal opened after it is lifted above it.
+// its portal; every Base UI portal opened after it is lifted above it, whether
+// it mounts BESIDE the panel's portal in <body> or INSIDE it: with a single
+// copy of Base UI (a production build), a portal opened from within another
+// mounts in the parent's portal node (`FloatingPortal`), right after the
+// panel. A dev server with two copies puts it beside — v1.0.1 covered only that.
 const PILE = "origin-cards-stack";
 if (typeof document !== "undefined" && !document.getElementById(PILE)) {
   const st = document.createElement("style");
   st.id = PILE;
-  st.textContent = "body > [data-origin-cards-panel] ~ [data-base-ui-portal] { position: relative; z-index: 62; }";
+  st.textContent = "body > [data-origin-cards-panel] ~ [data-base-ui-portal], [data-origin-cards-panel] [data-base-ui-portal] { position: relative; z-index: 62; }";
   document.head.append(st);
 }
 /** Ref of the panel popup: marks (and unmarks) the portal that holds it. */
