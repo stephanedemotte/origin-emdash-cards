@@ -166,6 +166,31 @@ const S = {
   row: { display: "flex", gap: 8, flexWrap: "wrap" },
 };
 
+// ——— Stacking: what opens ON TOP of the panel ———
+// The panel sits above the admin's sticky header (z 61), but the admin's own
+// dialogs — the media picker of an image sub-field, a confirm — carry no
+// z-index at all: Kumo stacks them in document order. Opened from the panel,
+// the picker landed BEHIND it, under its backdrop, unclickable. The panel marks
+// its portal; every Base UI portal opened after it is lifted above it.
+const PILE = "origin-cards-stack";
+if (typeof document !== "undefined" && !document.getElementById(PILE)) {
+  const st = document.createElement("style");
+  st.id = PILE;
+  st.textContent = "body > [data-origin-cards-panel] ~ [data-base-ui-portal] { position: relative; z-index: 62; }";
+  document.head.append(st);
+}
+/** Ref of the panel popup: marks (and unmarks) the portal that holds it. */
+const markPortal = (() => {
+  let marked = null;
+  return (node) => {
+    marked?.removeAttribute("data-origin-cards-panel");
+    marked = null;
+    let a = node;
+    while (a?.parentElement && a.parentElement !== document.body) a = a.parentElement;
+    if (a?.parentElement === document.body) (marked = a).setAttribute("data-origin-cards-panel", "");
+  };
+})();
+
 // ——— Sub-field inputs (the admin's own components, as its repeater uses them) ———
 
 function ImageInput({ id, label, value, onChange }) {
@@ -428,7 +453,7 @@ function Cards({ value, onChange, label, id, validation, options }) {
         open
           ? h(
               Dialog.Popup,
-              { style: S.panel },
+              { style: S.panel, ref: markPortal },
               h(
                 "div",
                 { style: S.panelHead },
